@@ -1,60 +1,50 @@
-perl6-CSS-Grammar
-=================
+EC-Grammars-DIG
+===============
 
-CSS::Grammar is under construction as an experimental set of Perl 6 grammars for the W3C family of CSS standards.
+EC::Grammars::DIG is a module that provides a very easy and clear way to parse the dig command.
 
-It aims to implement a reasonable portion of the base grammars with an
-emphasis on:
+It is part of the project HON, a blockchain that is being written in Perl6.
 
-- support for CSS1, CSS2.1 and CSS3
-- forward compatibility rules, scanning and error recovery
+Main features of this module
+- run dig command and receive main results parsed
+- GNU Licensed - Software Livre
 
-This module performs generic parsing of declarations in style-sheet rules.
+This module performs generic parsing on rules and tokens.
 
 Contents
 ========
 
-Base Grammars
--------------
-- `CSS::Grammar::CSS1`  - CSS 1.0 compatible grammar
-- `CSS::Grammar::CSS21` - CSS 2.1 compatible grammar
-- `CSS::Grammar::CSS3`  - CSS 3.0 (core) compatible grammar
-
-The CSS 3.0 core grammar, `CSS::Grammar::CSS3`, is based on CSS2.1; it understands:
-
-- `#hex` and `rgb(...)` colors; but not `rgba(..)`, `hsl(...)`, `hsla(...)` or named colors
-- basic `@media` at-rules; but not advanced media queries, resolutions or embedded `@page` rules.
-- basic `@page` page description rules
-- basic css3 level selectors
+Base Grammar
+------------
+- `EC::Grammars::DIG`  - Digs into dig with url
 
 Parser Actions
 --------------
-`CSS::Grammar::Actions` can be used with in conjunction with any of the CSS1
-CSS21 or CSS3 base grammars. It produces an abstract syntax tree (AST), plus
-warnings for any unexpected input.
+`EC::Grammars::DIG` will provide important information parsed like the IPs, the urls,
+used mainly for seeded out digs for P2P networks. A simple usage would be:
 
-    use v6;
-    use CSS::Grammar::CSS3;
-    use CSS::Grammar::Actions;
-
-    my $css = 'H1 { color: blue; gunk }';
-
-    my $actions =  CSS::Grammar::Actions.new;
-    my $p = CSS::Grammar::CSS3.parse($css, :actions($actions));
-    .note for $actions.warnings;
-    say "H1: " ~ $p.ast<stylesheet>[0]<ruleset><selectors>;
-    # output:
-    # dropping term: gunk
-    # H1: selector    simple-selector qname   element-name    h1
+    use EC::Grammars::DIG;
+    my $proc = run 'dig', URL_YOU_WANT_TO_DIG_HERE, :out, :err;
+    with $proc.out { say "Error running dig"; die; }
+    my $output = $proc.out.slurp: :close;
+    my $dig = EC::Grammars::DIG.new.parse( $output, :actions( EC:Grammars::DIG::Actions.new ) );
+    say $dig<DATE>; ## you may here query which ever tokens or rules desired
+    ## TO ITERATE USE, FOR INSTANCE:
+    for $dig<ANSWER> -> $answers {
+    say $answers<IP>; ## for instance
 
 ## Actions Options
 
 - **`:lax`** Pass back, don't drop, quantities with unknown dimensions.
 
-Installation (Rakudo Star)
---------------------------
+Installation
+------------
 
-You'll first need to download and build Rakudo Star 2015.07 or better (http://rakudo.org/downloads/star/ - don't forget the final `make install`):
+With zef: 
+
+    zef install EC::Grammars::DIG
+
+You'll first need to download and build Rakudo Star or better (http://rakudo.org/downloads/star/ - don't forget the final `make install`):
 
 Ensure that `perl6` and `panda` are available on your path, e.g. :
 
@@ -62,25 +52,19 @@ Ensure that `perl6` and `panda` are available on your path, e.g. :
 
 You can then use `panda` to test and install `CSS::Grammar`:
 
-    % panda install CSS::Grammar
+    % panda install EC::Grammars::DIG
 
 To try parsing some content:
 
-    % perl6 -MCSS::Grammar::CSS3 -e"say CSS::Grammar::CSS3.parse('H1 {color:blue}')"
+    % perl6 -MCSS::EC::Grammars::DIG -e"say EC::Grammars::DIG.parse( run 'dig', 'YOUR_URL_TO_DIG')"
 
 See Also
 --------
-- [CSS::Module::CSS3::Selectors](https://github.com/p6-css/perl6-CSS-Module-CSS3-Selectors) extends CSS::Grammar::CSS3 to fully implement CSS Level 3 Selectors.
-- [CSS::Module](https://github.com/p6-css/perl6-CSS-Module) further extends CSS::Grammar levels 1, 2.1 and 3. It understands named colors and is able to perform property-specific parsing and validation.
-- [CSS::Drafts](https://github.com/p6-css/perl6-CSS-Drafts) further extends CSS::Module, adding support for further draft CSS Level 3 extension modules.
-- [CSS::Writer](https://github.com/p6-css/perl6-CSS-Writer) - AST reserializer
-- [CSSGrammar.pm](https://github.com/perl6/perl6-examples/blob/master/categories/parsers/CSSGrammar.pm) from [perl6-examples](https://github.com/perl6/perl6-examples) gives an introductory Perl 6 grammar for CSS 2.1.
+- HON Post of Module: https://steemit.com/blockchain/@bitworkers/perl6-hon-decentralized-justice-deep-study-of-blockchain-code-this-effort-resulted-in-this-module 
+- HON Proposition: https://steemit.com/blockchain/@bitworkers/escrowchain-an-idea-to-build-an-escrow-blockchain-with-arbitration-currency
 
 References
 ----------
 This module been built from the W3C CSS Specifications. In particular:
 
-- CSS 1.0 Grammar - http://www.w3.org/TR/2008/REC-CSS1-20080411/#appendix-b
-- CSS 2.1 Grammar - http://www.w3.org/TR/CSS21/grammar.html
-- CSS3 module: Syntax - http://www.w3.org/TR/2014/CR-css-syntax-3-20140220/
-- CSS Style Attributes - http://www.w3.org/TR/2010/CR-css-style-attr-20101012/#syntax
+- Module Building - https://docs.perl6.org/language/modules
