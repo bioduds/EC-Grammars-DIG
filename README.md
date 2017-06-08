@@ -25,7 +25,7 @@ used mainly for seeded out digs for P2P networks. A simple usage would be:
 
     use EC::Grammars::DIG;
     my $proc = run 'dig', URL_YOU_WANT_TO_DIG_HERE, :out, :err;
-    with $proc.out { say "Error running dig"; die; }
+    with $proc.err { say "Error running dig"; die; }
     my $output = $proc.out.slurp: :close;
     my $dig = EC::Grammars::DIG.new.parse( $output, :actions( EC:Grammars::DIG::Actions.new ) );
     say $dig<DATE>; ## you may here query which ever tokens or rules desired
