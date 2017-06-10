@@ -10,5 +10,5 @@
     },
     "depends" : [ ],
     "resources" : [ ],
-    "source-url" : "git://github.com/you/EC-Grammars-DIG.git"
+    "source-url" : "git://github.com/bioduds/EC-Grammars-DIG.git"
 }
